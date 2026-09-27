@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartQMS - Project Review 1 Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #0ea5e9;
+      --primary-light: #38bdf8;
+      --secondary: #10b981;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0b0f19;
+      color: var(--text-main);
+      font-family: var(--font-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+
+    /* Presentation Container */
+    #deck-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 80%);
+    }
+
+    .slide {
+      position: absolute;
+      width: 90vw;
+      max-width: 1360px;
+      height: 85vh;
+      max-height: 780px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+      padding: 40px 48px;
+      display: none;
+      flex-direction: column;
+      backdrop-filter: blur(12px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Header styling */
+    .slide-header {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .breadcrumb {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .breadcrumb::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary);
+      border-radius: 50%;
+    }
+
+    .slide-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+
+    /* Grid & Card Utilities */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(14, 165, 233, 0.5);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title.primary { color: var(--primary); }
+    .card-title.secondary { color: var(--secondary); }
+    .card-title.accent { color: var(--accent); }
+    .card-title.danger { color: var(--danger); }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .bullet-list li strong {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .bullet-list li::before {
+      content: '▪';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+    }
+
+    .bullet-list.secondary li::before { color: var(--secondary); }
+    .bullet-list.accent li::before { color: var(--accent); }
+
+    /* Formula Box */
+    .formula-box {
+      background: #090d16;
+      border: 1px solid rgba(14, 165, 233, 0.4);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #38bdf8;
+      margin-bottom: 16px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+      line-height: 1.5;
+    }
+
+    /* Table styling */
+    table.slide-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    table.slide-table th {
+      background: #090d16;
+      color: var(--primary);
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--card-border);
+      font-weight: 700;
+    }
+
+    table.slide-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-muted);
+    }
+
+    table.slide-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    /* Bottom Controls */
+    #controls {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--card-border);
+      padding: 8px 18px;
+      border-radius: 40px;
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: background 0.2s;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--primary);
+    }
+
+    #slide-indicator {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      z-index: 101;
+    }
+
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .pill-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: rgba(14, 165, 233, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+
+    .pill-tag.green {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--secondary);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .pill-tag.amber {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    /* Print styling */
+    @media print {
+      body {
+        overflow: visible;
+        background: #fff;
+        color: #000;
+      }
+      #deck-container {
+        display: block;
+        height: auto;
+        background: none;
+      }
+      .slide {
+        display: flex !important;
+        position: relative;
+        page-break-after: always;
+        break-after: page;
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border: none;
+        box-shadow: none;
+        background: #fff;
+        color: #000;
+      }
+      #controls, .progress-bar-container {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <div id="deck-container">
+
+    <!-- SLIDE 1: TITLE SLIDE -->
+    <div class="slide active" id="slide-1">
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <span class="pill-tag">PROJECT REVIEW 1</span>
+          <span class="pill-tag green">CAPSTONE PRESENTATION</span>
+          <span class="pill-tag amber">INTEGRATED M.TECH SE</span>
+        </div>
+        <h1 style="font-size: 46px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          SmartQMS
+        </h1>
+        <h2 style="font-size: 22px; font-weight: 600; color: var(--primary); margin-bottom: 28px; line-height: 1.35;">
+          Intelligent Workflow-Aware Hospital Queue Management &amp; Dynamic Resource Allocation System
+        </h2>
+        
+        <div class="card" style="margin-bottom: 30px; background: rgba(30, 41, 59, 0.6); border-left: 4px solid var(--primary);">
+          <p style="font-size: 14px; color: var(--text-main); line-height: 1.6;">
+            A unified, priority-orchestrated healthcare queuing platform bridging clinical triage severity, automated multi-department care pathways (Consultation → Lab → Radiology → Pharmacy), sub-second WebSocket synchronization, and context-aware conversational AI.
+          </p>
+        </div>
+
+        <div class="grid-3" style="flex: none;">
+          <div class="card">
+            <span style="font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase;">Candidate Details</span>
+            <strong style="font-size: 15px; margin-top: 4px; color: #fff;">Register No: 24MIS0469</strong>
+            <span style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Integrated M.Tech Software Engineering</span>
+          </div>
+          <div class="card">
+            <span style="font-size: 10px; font-weight: 800; color: var(--secondary); text-transform: uppercase;">Project Phase</span>
+            <strong style="font-size: 15px; margin-top: 4px; color: #fff;">Project Review - 1</strong>
+            <span style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Literature Survey, Architecture &amp; Prototype</span>
+          </div>
+          <div class="card">
+            <span style="font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase;">Implementation</span>
+            <strong style="font-size: 15px; margin-top: 4px; color: #fff;">Working Full-Stack System</strong>
+            <span style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">React 18 + Node.js + Socket.IO + PostgreSQL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: PROBLEM STATEMENT -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div class="breadcrumb">Operational Context &amp; Motivation</div>
+        <h2 class="slide-title">Problem Statement: Bottlenecks in Hospital Outpatient Departments</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title primary">Operational Pain Points</div>
+          <ul class="bullet-list">
+            <li><strong>Static FCFS Paradigm:</strong> Conventional systems treat all patients equally; emergencies wait behind routine wellness checks.</li>
+            <li><strong>Departmental Silos:</strong> OPD, Diagnostic Labs, Imaging, and Pharmacy maintain isolated, disconnected queues.</li>
+            <li><strong>Cascading Surges:</strong> Delays in morning OPD cause massive sudden congestion at blood draw and X-Ray counters.</li>
+            <li><strong>Patient Unpunctuality:</strong> No-shows and late arrivals cause doctor counter starvation and scheduling instability.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">Clinical &amp; Patient Impact</div>
+          <ul class="bullet-list accent">
+            <li><strong>Compromised Triage:</strong> Unstable patients (acute chest pain, high pediatric fever) face hazardous waiting times.</li>
+            <li><strong>Severe Dwell Time:</strong> Multi-department visits stretch to 3–5 hours due to repeated manual queuing.</li>
+            <li><strong>Counter Idling vs Jamming:</strong> Specialist doctors sit idle waiting for delayed patients while adjacent rooms overflow.</li>
+            <li><strong>Patient Anxiety &amp; Chaos:</strong> Lack of wait transparency leads to agitated crowds at nurse stations and help desks.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">Real-World Operational Failure</div>
+          <ul class="bullet-list secondary">
+            <li><strong>Step 1: OPD Arrival:</strong> Takes token, waits 50 mins in General Medicine.</li>
+            <li><strong>Step 2: Lab Referral:</strong> Doctor orders ECG &amp; Troponin test. Patient walks to Lab.</li>
+            <li><strong>Step 3: Disconnected Re-Queue:</strong> Takes 2nd paper slip, waits in 30-person queue with routine fasting checks.</li>
+            <li><strong>Step 4: Imaging Delay:</strong> Waits in 3rd separate queue at Radiology.</li>
+            <li><strong>Step 5: The Breakdown:</strong> By the time results arrive, doctor shift has ended or initial queue is 20 people deep.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: OBJECTIVES -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div class="breadcrumb">Project Goals &amp; Innovations</div>
+        <h2 class="slide-title">Core Research Objectives &amp; System Deliverables</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title primary">1. Dynamic Triage-Aware Priority Engine</div>
+          <ul class="bullet-list">
+            <li>Formulate an intelligent multi-factor priority algorithm integrating Clinical Acuity (ESI 0–2).</li>
+            <li>Incorporate appointment window punctuality vs walk-in arrival weighting.</li>
+            <li>Introduce a logarithmic aging factor: <code>ln(1 + t - t_checkin)</code> to permanently eliminate infinite starvation of routine patients.</li>
+            <li>Age vulnerability weighting for pediatric (&lt;5 yrs) and geriatric (&gt;65 yrs) care.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">2. Multi-Stage Clinical Workflow Orchestrator</div>
+          <ul class="bullet-list secondary">
+            <li>Model patient clinical care trajectories as Directed Acyclic Graphs (DAG).</li>
+            <li>Unified master QR token across all departments (Consult → Lab → X-Ray → Pharmacy).</li>
+            <li>Automated background queue registration and pre-notification for downstream counters.</li>
+            <li>Preserve cumulative waiting tenure across inter-department handoffs.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">3. Adaptive Wait-Time Forecasting &amp; Public Kiosks</div>
+          <ul class="bullet-list accent">
+            <li>Calculate rolling EWMA of consultation durations over preceding 2-hour windows.</li>
+            <li>Provide confidence-bounded wait intervals: <code>[We · (1 - α), We · (1 + β)]</code>.</li>
+            <li>Contactless self-service touch kiosk for rapid token generation.</li>
+            <li>Wall-mounted public TV displays with audio chime announcements.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title primary">4. Sub-Second Event Bus &amp; Grounded AI Guidance</div>
+          <ul class="bullet-list">
+            <li>Socket.IO bidirectional event pipeline ensuring sub-100ms state dissemination.</li>
+            <li>Doctor room locking mechanism (Available → Calling → Occupied → Completed).</li>
+            <li>Grounded AI Assistant (Google Gemini LLM) answering token status and prep FAQs.</li>
+            <li>Role-Based Access Control (RBAC) with complete event-sourced audit logging.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: LITERATURE SURVEY OVERVIEW -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div class="breadcrumb">Academic Foundations</div>
+        <h2 class="slide-title">Literature Survey: 15 Peer-Reviewed Works (2022–2026)</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title primary">Queuing Models &amp; Scheduling</div>
+          <ul class="bullet-list">
+            <li><strong>Al-Refaie et al. (2023):</strong> ESI multi-priority ER queuing; cuts emergency delays but limited to single-stage ER.</li>
+            <li><strong>Zhang &amp; Wang (2024):</strong> Discrete-event simulation (Arena); 22% wait cut via room reallocation; static offline only.</li>
+            <li><strong>Liu et al. (2025):</strong> Stochastic appointment buffers; reduces unpunctuality idle time; isolated single clinic.</li>
+            <li><strong>Gupta &amp; Mehrotra (2022):</strong> Walk-in &amp; appointment interleaving; optimal for single server, fails in multi-server.</li>
+            <li><strong>Lakshmi &amp; Iyer (2023):</strong> Healthcare queuing survey; reveals &lt;8% papers deploy working full-stack systems.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">IoT, Workflows &amp; Handoffs</div>
+          <ul class="bullet-list secondary">
+            <li><strong>Suresh &amp; Sundararajan (2023):</strong> RFID &amp; IoT smart token kiosk; eliminates paper slips but adheres to rigid FIFO.</li>
+            <li><strong>Kavitha &amp; Mohan (2024):</strong> Petri-net formal workflow coordination for clinic-lab pipelines; purely conceptual.</li>
+            <li><strong>Patel &amp; Joshi (2025):</strong> Inpatient transfer queuing; proves handoffs cause 40% delays; ignores outpatient OPD.</li>
+            <li><strong>Fernandez et al. (2023):</strong> Automated SMS/app push notifications; cuts no-shows by 31.4%; fixed time triggers only.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">AI, Telemetry &amp; Real-Time Sync</div>
+          <ul class="bullet-list accent">
+            <li><strong>El-Banna et al. (2023):</strong> Random Forest/XGBoost wait time prediction; accurate MAE but purely passive model.</li>
+            <li><strong>Chen et al. (2025):</strong> Deep Q-Network (DQN) room allocation; high compute cost &amp; unexplainable black-box decisions.</li>
+            <li><strong>Rahman &amp; Hasan (2024):</strong> Polyclinic triage heuristics; static priority causes severe starvation during surges.</li>
+            <li><strong>Nair et al. (2026):</strong> Kafka &amp; WebSocket hospital telemetry; sub-second broadcast but no active dispatch logic.</li>
+            <li><strong>Martinez et al. (2026):</strong> LLM patient navigation; high usability but lacks live DB context, causing hallucinations.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: LITERATURE COMPARISON MATRIX -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div class="breadcrumb">Methodological Analysis</div>
+        <h2 class="slide-title">Literature Comparison Matrix &amp; Gaps Identified</h2>
+      </div>
+      <div style="flex: 1; overflow-y: auto; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--card-border);">
+        <table class="slide-table">
+          <thead>
+            <tr>
+              <th style="width: 8%;">Year</th>
+              <th style="width: 24%;">Paper &amp; Technique</th>
+              <th style="width: 22%;">Key Merits</th>
+              <th style="width: 23%;">Identified Demerits</th>
+              <th style="width: 23%; color: var(--secondary);">SmartQMS Advancement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>2023</strong></td>
+              <td>Multi-Priority Queuing (Al-Refaie)</td>
+              <td>Reduces critical patient wait times</td>
+              <td>High starvation risk for non-urgent patients</td>
+              <td style="color: var(--secondary);">Logarithmic aging prevents starvation</td>
+            </tr>
+            <tr>
+              <td><strong>2024</strong></td>
+              <td>Arena Simulation (Zhang &amp; Wang)</td>
+              <td>Accurate bottleneck detection &amp; room reallocation</td>
+              <td>Offline batch execution only; no live queue sync</td>
+              <td style="color: var(--secondary);">Live feedback-driven operational execution</td>
+            </tr>
+            <tr>
+              <td><strong>2023</strong></td>
+              <td>IoT Smart Tokens (Suresh &amp; Sundar.)</td>
+              <td>Replaces paper slips; digital displays</td>
+              <td>Static FIFO dispatch; ignores triage acuity</td>
+              <td style="color: var(--secondary);">Dynamic Triage + Cryptographic QR</td>
+            </tr>
+            <tr>
+              <td><strong>2024</strong></td>
+              <td>Petri Net Workflows (Kavitha &amp; M.)</td>
+              <td>Formal multi-department synchronization</td>
+              <td>Conceptual; no kiosk or clinician software UI</td>
+              <td style="color: var(--secondary);">Full-stack web/kiosk DAG orchestration</td>
+            </tr>
+            <tr>
+              <td><strong>2025</strong></td>
+              <td>Reinforcement Learning (Chen et al.)</td>
+              <td>Self-learning counter allocation policies</td>
+              <td>High compute cost; unexplainable black-box</td>
+              <td style="color: var(--secondary);">Explainable, auditable deterministic priority</td>
+            </tr>
+            <tr>
+              <td><strong>2026</strong></td>
+              <td>Telemetry &amp; LLMs (Nair / Martinez)</td>
+              <td>Sub-second event bus &amp; conversational chat</td>
+              <td>Passive monitoring only; LLMs hallucinate wait times</td>
+              <td style="color: var(--secondary);">Socket.IO dispatch + DB-grounded LLM context</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: RESEARCH GAP -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div class="breadcrumb">Critical Need for Research</div>
+        <h2 class="slide-title">The Central Research Gap &amp; The SmartQMS Solution</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title danger">5 Fragmented Paradigms in Existing Literature</div>
+          <ul class="bullet-list">
+            <li><strong>Single-Stage Queuing Island:</strong> Optimizes ER or OPD in isolation, ignoring downstream multi-department referrals.</li>
+            <li><strong>Archaic FIFO Token Systems:</strong> Digital LED screens still use blind First-Come-First-Served order.</li>
+            <li><strong>Passive Predictive Models:</strong> Forecast wait times without actively routing or reordering tokens.</li>
+            <li><strong>Opaque AI Black-Boxes:</strong> Deep RL decisions cannot be audited or overridden by clinical doctors.</li>
+            <li><strong>Disconnected Information Silos:</strong> Zero real-time sync between kiosks, doctor rooms, and hall displays.</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color: rgba(16, 185, 129, 0.4);">
+          <div class="card-title secondary">Central Research Question</div>
+          <p style="font-size: 13.5px; font-style: italic; color: #fff; line-height: 1.5; margin-bottom: 16px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+            “How can a unified healthcare queue platform dynamically orchestrate multi-department workflows, adaptively balance clinical urgency with waiting-time fairness, provide confidence-bounded wait estimates, and maintain sub-second multi-client synchronization across physical hospital counters?”
+          </p>
+          <div class="card-title primary" style="font-size: 13px; margin-bottom: 8px;">SmartQMS 4 Foundational Pillars:</div>
+          <ul class="bullet-list secondary" style="font-size: 12.5px;">
+            <li><strong>Chained Workflow DAG:</strong> Automatic inter-department transfers.</li>
+            <li><strong>Dynamic Fair-Priority Scoring (DFPS):</strong> Triage + Punctuality + Aging.</li>
+            <li><strong>Sub-Second Reactive Event Bus:</strong> Real-time Socket.IO broadcasts.</li>
+            <li><strong>Explainable Architecture:</strong> Auditable rules with doctor overrides.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: SYSTEM ARCHITECTURE -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div class="breadcrumb">System Architecture</div>
+        <h2 class="slide-title">4-Tier Reactive Full-Stack System Architecture</h2>
+      </div>
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-title primary">Tier 1: Client Interfaces</div>
+          <ul class="bullet-list">
+            <li><strong>Touch Kiosk Portal:</strong> Self-service token generation &amp; QR scanner.</li>
+            <li><strong>Public Hall Monitor:</strong> High-contrast TV display with chime audio.</li>
+            <li><strong>Doctor Chamber Portal:</strong> Chamber controls, calling, notes &amp; transfers.</li>
+            <li><strong>Executive Dashboard:</strong> Real-time analytics, queue monitoring &amp; logs.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">Tier 2: Real-Time Gateway</div>
+          <ul class="bullet-list secondary">
+            <li><strong>Express REST API:</strong> JSON endpoints for state mutations &amp; CRUD.</li>
+            <li><strong>Socket.IO Event Bus:</strong> Room-based low-latency event broadcasting.</li>
+            <li><strong>JWT &amp; RBAC Auth:</strong> Secure role-based middleware for all endpoints.</li>
+            <li><strong>Gemini AI Adapter:</strong> Injects live queue state into LLM context.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">Tier 3: Business Core</div>
+          <ul class="bullet-list accent">
+            <li><strong>Priority Scoring Engine:</strong> Computes dynamic triage weights with aging.</li>
+            <li><strong>Workflow Orchestrator:</strong> Manages care DAG execution across rooms.</li>
+            <li><strong>Adaptive Estimator:</strong> EWMA historical throughput calculation.</li>
+            <li><strong>Counter Load Balancer:</strong> Directs patients to available rooms.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title primary">Tier 4: Persistence Tier</div>
+          <ul class="bullet-list">
+            <li><strong>Prisma ORM:</strong> Type-safe relational database management.</li>
+            <li><strong>PostgreSQL:</strong> Relational schema for Users, Queues, Workflows.</li>
+            <li><strong>Event Telemetry Store:</strong> Microsecond timestamps for every transition.</li>
+            <li><strong>Audit Logging:</strong> Immutable tracking of overrides and transfers.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: MATHEMATICAL MODELING -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <div class="breadcrumb">Mathematical Modeling</div>
+        <h2 class="slide-title">Mathematical Formulations: Dynamic Priority &amp; Adaptive Wait</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title primary">1. Dynamic Fair-Priority Scoring (DFPS)</div>
+          <div class="formula-box">
+            P_i(t) = w_1·Acuity(i) + w_2·ApptPunctuality(i,t) +<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;w_3·ln(1 + t - t_checkin) + w_4·AgeVulnerability(i)
+          </div>
+          <ul class="bullet-list">
+            <li><strong>Acuity(i) ∈ {0, 1, 2}:</strong> Clinical triage severity rating (0 = Routine, 1 = Urgent, 2 = Emergency).</li>
+            <li><strong>ApptPunctuality(i, t):</strong> Bell-curve weight peaking if arrival is within the scheduled appointment window.</li>
+            <li><strong>ln(1 + t - t_checkin):</strong> Logarithmic aging factor guaranteeing that waiting time steadily elevates any patient's rank, eliminating starvation.</li>
+            <li><strong>AgeVulnerability(i):</strong> Priority weight for pediatric (&lt;5 yrs) and geriatric (&gt;65 yrs) patients.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">2. Adaptive Wait-Time Forecasting (EWMA)</div>
+          <div class="formula-box">
+            W_e = (N_ahead · μ_service) / C_active<br>
+            Confidence Interval = [ W_e · (1 - α),  W_e · (1 + β) ]
+          </div>
+          <ul class="bullet-list accent">
+            <li><strong>N_ahead:</strong> Count of uncalled tokens in current queue with higher priority rank.</li>
+            <li><strong>μ_service (EWMA):</strong> Rolling Exponentially Weighted Moving Average of actual consultation durations over the last 2 hours:
+              <br><code style="font-size: 11px; color: var(--secondary);">μ(t) = λ·S_current + (1-λ)·μ(t-1)  [λ = 0.2]</code>
+            </li>
+            <li><strong>C_active:</strong> Number of currently active/available doctor rooms in the department.</li>
+            <li><strong>[α, β] Margins:</strong> Dynamically scaled by service time standard deviation.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: MULTI-STAGE WORKFLOW -->
+    <div class="slide" id="slide-9">
+      <div class="slide-header">
+        <div class="breadcrumb">Clinical Process Engineering</div>
+        <h2 class="slide-title">Multi-Stage Workflow Orchestration: Chained Patient Journey</h2>
+      </div>
+      <div class="grid-5" style="margin-bottom: 20px;">
+        <div class="card">
+          <span class="pill-tag" style="margin-bottom: 8px;">STAGE 1</span>
+          <strong style="font-size: 14px; color: #fff; margin-bottom: 6px;">Check-In</strong>
+          <span style="font-size: 12px; color: var(--text-muted);">Appointment QR or Walk-in Kiosk; token issued (e.g., C-001).</span>
+        </div>
+        <div class="card">
+          <span class="pill-tag green" style="margin-bottom: 8px;">STAGE 2</span>
+          <strong style="font-size: 14px; color: #fff; margin-bottom: 6px;">Consultation</strong>
+          <span style="font-size: 12px; color: var(--text-muted);">Doctor calls next; examines patient; prescribes blood &amp; X-ray tests.</span>
+        </div>
+        <div class="card">
+          <span class="pill-tag amber" style="margin-bottom: 8px;">STAGE 3</span>
+          <strong style="font-size: 14px; color: #fff; margin-bottom: 6px;">Auto-Transfer</strong>
+          <span style="font-size: 12px; color: var(--text-muted);">Step 1 completion auto-registers patient into Lab queue (L-014).</span>
+        </div>
+        <div class="card">
+          <span class="pill-tag" style="margin-bottom: 8px;">STAGE 4</span>
+          <strong style="font-size: 14px; color: #fff; margin-bottom: 6px;">Diagnostics</strong>
+          <span style="font-size: 12px; color: var(--text-muted);">Sample collected/scanned; results recorded; auto-routes to next stage.</span>
+        </div>
+        <div class="card">
+          <span class="pill-tag green" style="margin-bottom: 8px;">STAGE 5</span>
+          <strong style="font-size: 14px; color: #fff; margin-bottom: 6px;">Pharmacy</strong>
+          <span style="font-size: 12px; color: var(--text-muted);">Prescription dispensed; master workflow marked COMPLETED.</span>
+        </div>
+      </div>
+      <div class="card" style="border-left: 4px solid var(--secondary);">
+        <strong style="font-size: 13.5px; color: var(--secondary); margin-bottom: 4px;">Key Value Proposition: Zero Manual Re-Ticketing</strong>
+        <p style="font-size: 13px; color: var(--text-main); line-height: 1.5;">
+          Unlike traditional hospitals where patients must pull a fresh paper slip at every physical desk, SmartQMS maintains a single cryptographic master token. Cumulative wait times in previous queues are preserved and rewarded in downstream priority calculations.
+        </p>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: MODULES IMPLEMENTED -->
+    <div class="slide" id="slide-10">
+      <div class="slide-header">
+        <div class="breadcrumb">System Modules</div>
+        <h2 class="slide-title">System Modules Implemented in Full-Stack Prototype</h2>
+      </div>
+      <div class="grid-3" style="grid-template-rows: 1fr 1fr;">
+        <div class="card">
+          <div class="card-title primary">1. QR Kiosk &amp; Check-In</div>
+          <ul class="bullet-list">
+            <li>Walk-in token generation with symptom categories.</li>
+            <li>QR code scanner for booked appointments.</li>
+            <li>Multi-language touch-friendly responsive interface.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">2. Doctor Chamber Portal</div>
+          <ul class="bullet-list secondary">
+            <li>One-click 'Call Next' highest-priority patient.</li>
+            <li>Room state toggle (Available, Occupied, Maintenance).</li>
+            <li>Consultation notes, soft skips, recalls &amp; transfers.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">3. Public Waiting Display</div>
+          <ul class="bullet-list accent">
+            <li>High-contrast wall TV view with audio announcements.</li>
+            <li>Flashes called token number and chamber number.</li>
+            <li>Live upcoming queue list &amp; estimated waiting time.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title primary">4. Workflow Orchestrator</div>
+          <ul class="bullet-list">
+            <li>Chained DAG execution across multi-department visits.</li>
+            <li>Background queue auto-push without human re-entry.</li>
+            <li>Synchronized state between Reception, OPD, Lab, Rx.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">5. Executive Analytics</div>
+          <ul class="bullet-list secondary">
+            <li>Real-time telemetry (AWT, throughput, idle ratio).</li>
+            <li>Immutable audit logs of all calls, skips, and overrides.</li>
+            <li>Department load forecasting &amp; peak arrival curves.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">6. Contextual AI Assistant</div>
+          <ul class="bullet-list accent">
+            <li>Google Gemini LLM grounded in live DB queue context.</li>
+            <li>Answers token status, room directions &amp; wait inquiries.</li>
+            <li>Pre-test guidance (fasting rules, required documents).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: TECH STACK & DATABASE -->
+    <div class="slide" id="slide-11">
+      <div class="slide-header">
+        <div class="breadcrumb">Implementation Architecture</div>
+        <h2 class="slide-title">Technology Stack &amp; Relational Database Architecture</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title primary">Production-Grade Technology Stack</div>
+          <ul class="bullet-list">
+            <li><strong>Frontend Framework:</strong> React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons.</li>
+            <li><strong>Real-Time Transport:</strong> Socket.IO Client &amp; Server with room-based broadcast.</li>
+            <li><strong>Application Server:</strong> Node.js, Express, TypeScript, RESTful JSON architecture.</li>
+            <li><strong>Authentication &amp; Security:</strong> JWT (JSON Web Tokens), bcrypt hashing, RBAC.</li>
+            <li><strong>ORM &amp; Database:</strong> Prisma ORM + PostgreSQL Relational Database.</li>
+            <li><strong>AI / LLM Integration:</strong> Google Gemini API (@google/genai) context adapter.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">Database Schema Entities (Prisma / PostgreSQL)</div>
+          <ul class="bullet-list secondary">
+            <li><strong>User, Doctor, Staff:</strong> Authentication credentials, roles, assigned rooms.</li>
+            <li><strong>Department &amp; Room:</strong> Capacity, active counters, status (AVAILABLE, OCCUPIED).</li>
+            <li><strong>Patient &amp; QRToken:</strong> Cryptographic token strings, medical history links.</li>
+            <li><strong>Appointment:</strong> Scheduled time slot, doctor allocation, attendance status.</li>
+            <li><strong>Queue &amp; QueueEntry:</strong> Dynamic priority weight, timestamps (checkin, start, end).</li>
+            <li><strong>PatientWorkflow &amp; Step:</strong> Master multi-stage care pathway tracker.</li>
+            <li><strong>AuditLog:</strong> Tamper-evident logging of all state actions and clinician overrides.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: EVALUATION PLAN -->
+    <div class="slide" id="slide-12">
+      <div class="slide-header">
+        <div class="breadcrumb">Verification &amp; Validation</div>
+        <h2 class="slide-title">Experimental Evaluation Plan, Baselines &amp; Benchmarks</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title accent">4 Benchmark Baselines</div>
+          <ul class="bullet-list accent">
+            <li><strong>Baseline 1: Random / Unregulated Walk-in:</strong> Physical lobby crowds outside rooms without centralized tokenization.</li>
+            <li><strong>Baseline 2: Pure FCFS Electronic Token System:</strong> Standard electronic token dispenser operating strictly on First-Come-First-Served.</li>
+            <li><strong>Baseline 3: Static Appointment Scheduling:</strong> Fixed-slot scheduling with no adaptive handling of consultation overruns or walk-in surges.</li>
+            <li><strong>Baseline 4: Disconnected Multi-Queue Systems:</strong> Department-isolated queues requiring manual re-ticketing at each stage.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">Quantitative Metrics &amp; Hypotheses</div>
+          <ul class="bullet-list secondary">
+            <li><strong>Average Wait Time (AWT):</strong> Mean elapsed duration from check-in to consultation start across all departments.</li>
+            <li><strong>Total Hospital Dwell Time (THDT):</strong> Cumulative time for multi-stage visits (Consult → Lab → Pharmacy).</li>
+            <li><strong>Counter Idle Ratio (CIR):</strong> % of operational hours doctor chambers remain idle while patients wait.</li>
+            <li><strong>Triage Response Latency (TRL):</strong> Time taken to serve Category-1 (Emergency) arrivals.</li>
+            <li><strong>Starvation Index:</strong> Maximum wait time of routine walk-in tokens during peak hours.</li>
+          </ul>
+          <div style="margin-top: 14px; padding: 8px 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            <strong style="color: var(--secondary); font-size: 12px;">Target Hypotheses:</strong>
+            <span style="font-size: 12px; color: #fff;"> 30%–45% cut in THDT, &gt;60% cut in TRL, zero starvation, sub-100ms sync.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: REVIEW 1 STATUS -->
+    <div class="slide" id="slide-13">
+      <div class="slide-header">
+        <div class="breadcrumb">Project Status</div>
+        <h2 class="slide-title">Review 1 Status: Accomplishments &amp; Working Prototype</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title primary">Theoretical &amp; Design Phase</div>
+          <ul class="bullet-list">
+            <li><strong>Literature Review:</strong> 15 peer-reviewed works (2022–2026) fully synthesized.</li>
+            <li><strong>Research Gap:</strong> 5 isolated paradigms formally identified and analyzed.</li>
+            <li><strong>Mathematical Formulations:</strong> DFPS priority scoring and EWMA wait estimation models defined.</li>
+            <li><strong>System Architecture:</strong> 4-tier modular, event-driven reactive architecture finalized.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">Full-Stack Implementation</div>
+          <ul class="bullet-list secondary">
+            <li><strong>Backend Server:</strong> Node.js + Express + TypeScript with JWT and RBAC middleware.</li>
+            <li><strong>Database &amp; Schema:</strong> PostgreSQL configured with Prisma ORM; seed script creates realistic demo data.</li>
+            <li><strong>Socket.IO Gateway:</strong> Real-time token calling and queue broadcasts active.</li>
+            <li><strong>Frontend Web App:</strong> React 18 + Vite responsive dashboards for all hospital roles.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title accent">Live Demo Ready Endpoints</div>
+          <ul class="bullet-list accent">
+            <li><strong>Kiosk Check-in (<code>/kiosk</code>):</strong> Generate walk-in token or scan appointment QR.</li>
+            <li><strong>Public TV Display (<code>/display</code>):</strong> Large screen with token flashing and audio chime.</li>
+            <li><strong>Doctor Portal (<code>/queue</code>):</strong> Chamber calling, start service, skip &amp; transfers.</li>
+            <li><strong>Admin Analytics (<code>/admin</code>):</strong> Queue throughput, wait times &amp; audit logs.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: ROADMAP & CONCLUSION -->
+    <div class="slide" id="slide-14">
+      <div class="slide-header">
+        <div class="breadcrumb">Roadmap &amp; Conclusion</div>
+        <h2 class="slide-title">Review 2 Milestone Roadmap &amp; Final Conclusion</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title primary">Review 2 &amp; Final Review Roadmap</div>
+          <ul class="bullet-list">
+            <li><strong>Phase 1: Simulation Benchmarking:</strong> Implement discrete-event simulation comparing SmartQMS against Baselines 1–4 under Poisson arrival surges.</li>
+            <li><strong>Phase 2: Concurrency &amp; Load Testing:</strong> Benchmark WebSocket latency under 1000+ concurrent simulated patient kiosks and displays.</li>
+            <li><strong>Phase 3: AI Assistant Fine-Tuning:</strong> Expand Google Gemini LLM context with hospital floorplans, doctor schedules, and department prep checklists.</li>
+            <li><strong>Phase 4: Pilot Clinical Deployment:</strong> Test in mock OPD setting with barcode/RFID hardware scanners.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title secondary">Conclusion &amp; Key Takeaways</div>
+          <ul class="bullet-list secondary" style="margin-bottom: 20px;">
+            <li><strong>Solves Hospital Fragmentation:</strong> Unifies clinical triage acuity with multi-department operational execution.</li>
+            <li><strong>Guaranteed Fairness:</strong> Logarithmic time-aging prevents starvation while prioritizing emergencies.</li>
+            <li><strong>Production-Grade Full Stack:</strong> Fully operational React, Node.js, Socket.IO, PostgreSQL codebase ready for demonstration.</li>
+          </ul>
+          <div style="text-align: center; padding: 16px; background: rgba(14, 165, 233, 0.1); border-radius: 12px; border: 1px solid var(--primary);">
+            <h3 style="font-size: 18px; color: #fff; margin-bottom: 4px;">THANK YOU!</h3>
+            <span style="font-size: 13px; color: var(--primary);">Questions &amp; Discussion</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div id="controls">
+    <button class="ctrl-btn" onclick="prevSlide()" title="Previous (Left Arrow)">◀ Prev</button>
+    <div id="slide-indicator">1 / 14</div>
+    <button class="ctrl-btn" onclick="nextSlide()" title="Next (Right Arrow or Space)">Next ▶</button>
+    <button class="ctrl-btn" onclick="toggleFullscreen()" title="Fullscreen (F)">⛶ Fullscreen</button>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 14;
+
+    function updateSlide() {
+      document.querySelectorAll('.slide').forEach((s, idx) => {
+        s.classList.toggle('active', idx + 1 === currentSlide);
+      });
+      document.getElementById('slide-indicator').textContent = `${currentSlide} / ${totalSlides}`;
+      document.getElementById('progress-bar').style.width = `${(currentSlide / totalSlides) * 100}%`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'Home') {
+        currentSlide = 1;
+        updateSlide();
+      } else if (e.key === 'End') {
+        currentSlide = totalSlides;
+        updateSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

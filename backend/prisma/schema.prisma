@@ -1,0 +1,457 @@
+// SmartQMS Database Schema
+// Smart Hospital Queue Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ──────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  RECEPTIONIST
+  DOCTOR
+  LAB_STAFF
+  DIAGNOSTIC_STAFF
+  PATIENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CHECKED_IN
+  IN_QUEUE
+  IN_SERVICE
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum QueueEntryStatus {
+  WAITING
+  CALLED
+  IN_SERVICE
+  COMPLETED
+  SKIPPED
+  CANCELLED
+  NO_SHOW
+}
+
+enum WorkflowStepStatus {
+  PENDING
+  WAITING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum QRTokenStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  REVOKED
+}
+
+enum NotificationType {
+  APPOINTMENT_REMINDER
+  CHECKIN_CONFIRMATION
+  TOKEN_GENERATED
+  QUEUE_APPROACHING
+  TOKEN_CALLED
+  SERVICE_COMPLETED
+  NEXT_DEPARTMENT
+  GENERAL
+}
+
+// ─── USERS & AUTH ───────────────────────────────────────
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  username      String   @unique
+  passwordHash  String   @map("password_hash")
+  role          Role
+  firstName     String   @map("first_name")
+  lastName      String   @map("last_name")
+  phone         String?
+  isActive      Boolean  @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  doctor        Doctor?
+  staff         Staff?
+  patient       Patient?
+  auditLogs     AuditLog[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// ─── PATIENTS ───────────────────────────────────────────
+
+model Patient {
+  id               String   @id @default(uuid())
+  patientId        String   @unique @map("patient_id") // P-2026-000124
+  userId           String?  @unique @map("user_id")
+  firstName        String   @map("first_name")
+  lastName         String   @map("last_name")
+  dateOfBirth      DateTime? @map("date_of_birth")
+  age              Int?
+  gender           Gender?
+  phone            String
+  email            String?
+  address          String?
+  emergencyContact String?  @map("emergency_contact")
+  bloodGroup       String?  @map("blood_group")
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user             User?    @relation(fields: [userId], references: [id])
+  appointments     Appointment[]
+  qrTokens         QRToken[]
+  workflows        PatientWorkflow[]
+  aiConversations  AIConversation[]
+
+  @@map("patients")
+}
+
+// ─── DOCTORS ────────────────────────────────────────────
+
+model Doctor {
+  id             String   @id @default(uuid())
+  userId         String   @unique @map("user_id")
+  employeeId     String   @unique @map("employee_id")
+  departmentId   String   @map("department_id")
+  specialization String?
+  qualification  String?
+  isAvailable    Boolean  @default(true) @map("is_available")
+  consultationDuration Int @default(15) @map("consultation_duration") // minutes
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user           User       @relation(fields: [userId], references: [id])
+  department     Department @relation(fields: [departmentId], references: [id])
+  appointments   Appointment[]
+  rooms          Room[]
+
+  @@map("doctors")
+}
+
+// ─── STAFF ──────────────────────────────────────────────
+
+model Staff {
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
+  employeeId   String   @unique @map("employee_id")
+  departmentId String?  @map("department_id")
+  position     String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user         User       @relation(fields: [userId], references: [id])
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  @@map("staff")
+}
+
+// ─── DEPARTMENTS ────────────────────────────────────────
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  code        String   @unique // CARD, LAB, XRAY, etc.
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  doctors     Doctor[]
+  staff       Staff[]
+  services    Service[]
+  rooms       Room[]
+  queues      Queue[]
+  appointments Appointment[]
+  workflowSteps WorkflowStep[]
+
+  @@map("departments")
+}
+
+// ─── SERVICES ───────────────────────────────────────────
+
+model Service {
+  id            String   @id @default(uuid())
+  name          String
+  departmentId  String   @map("department_id")
+  description   String?
+  durationMins  Int      @default(15) @map("duration_mins")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  department    Department @relation(fields: [departmentId], references: [id])
+  workflowSteps WorkflowStep[]
+
+  @@map("services")
+}
+
+// ─── ROOMS ──────────────────────────────────────────────
+
+model Room {
+  id           String     @id @default(uuid())
+  roomNumber   String     @map("room_number")
+  departmentId String     @map("department_id")
+  doctorId     String?    @map("doctor_id")
+  status       RoomStatus @default(AVAILABLE)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  department   Department @relation(fields: [departmentId], references: [id])
+  doctor       Doctor?    @relation(fields: [doctorId], references: [id])
+  queueEntries QueueEntry[]
+
+  @@unique([roomNumber, departmentId])
+  @@map("rooms")
+}
+
+// ─── APPOINTMENTS ───────────────────────────────────────
+
+model Appointment {
+  id           String            @id @default(uuid())
+  patientId    String            @map("patient_id")
+  doctorId     String?           @map("doctor_id")
+  departmentId String            @map("department_id")
+  date         DateTime
+  timeSlot     String            @map("time_slot")
+  status       AppointmentStatus @default(SCHEDULED)
+  notes        String?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  patient      Patient    @relation(fields: [patientId], references: [id])
+  doctor       Doctor?    @relation(fields: [doctorId], references: [id])
+  department   Department @relation(fields: [departmentId], references: [id])
+  queueEntry   QueueEntry?
+
+  @@map("appointments")
+}
+
+// ─── QR TOKENS ──────────────────────────────────────────
+
+model QRToken {
+  id          String        @id @default(uuid())
+  token       String        @unique
+  patientId   String        @map("patient_id")
+  payload     String        // JSON: { patientId, appointmentId }
+  status      QRTokenStatus @default(ACTIVE)
+  expiresAt   DateTime      @map("expires_at")
+  usedAt      DateTime?     @map("used_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  // Relations
+  patient     Patient @relation(fields: [patientId], references: [id])
+
+  @@map("qr_tokens")
+}
+
+// ─── QUEUES ─────────────────────────────────────────────
+
+model Queue {
+  id           String   @id @default(uuid())
+  departmentId String   @unique @map("department_id")
+  prefix       String   // C, L, X, E, G
+  currentNumber Int     @default(0) @map("current_number")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  department   Department   @relation(fields: [departmentId], references: [id])
+  entries      QueueEntry[]
+
+  @@map("queues")
+}
+
+model QueueEntry {
+  id            String           @id @default(uuid())
+  tokenNumber   String           @map("token_number") // C-001
+  queueId       String           @map("queue_id")
+  appointmentId String?          @unique @map("appointment_id")
+  patientWorkflowId String?      @map("patient_workflow_id")
+  workflowStepId String?         @map("workflow_step_id")
+  roomId        String?          @map("room_id")
+  status        QueueEntryStatus @default(WAITING)
+  priority      Int              @default(0) // 0=normal, 1=appointment, 2=emergency
+  checkinTime   DateTime         @default(now()) @map("checkin_time")
+  calledAt      DateTime?        @map("called_at")
+  serviceStartAt DateTime?       @map("service_start_at")
+  serviceEndAt  DateTime?        @map("service_end_at")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  queue         Queue       @relation(fields: [queueId], references: [id])
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  room          Room?       @relation(fields: [roomId], references: [id])
+  workflow      PatientWorkflow? @relation(fields: [patientWorkflowId], references: [id])
+  workflowStep  WorkflowStep?    @relation(fields: [workflowStepId], references: [id])
+  events        QueueEvent[]
+
+  @@map("queue_entries")
+}
+
+model QueueEvent {
+  id           String   @id @default(uuid())
+  entryId      String   @map("entry_id")
+  action       String   // CREATED, CALLED, STARTED, COMPLETED, SKIPPED, CANCELLED, RECALLED
+  performedBy  String?  @map("performed_by")
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  entry        QueueEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@map("queue_events")
+}
+
+// ─── PATIENT WORKFLOW ───────────────────────────────────
+
+model PatientWorkflow {
+  id         String   @id @default(uuid())
+  patientId  String   @map("patient_id")
+  status     String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  patient    Patient        @relation(fields: [patientId], references: [id])
+  steps      WorkflowStep[]
+  queueEntries QueueEntry[]
+
+  @@map("patient_workflows")
+}
+
+model WorkflowStep {
+  id           String             @id @default(uuid())
+  workflowId   String             @map("workflow_id")
+  departmentId String             @map("department_id")
+  serviceId    String?            @map("service_id")
+  stepOrder    Int                @map("step_order")
+  status       WorkflowStepStatus @default(PENDING)
+  notes        String?
+  startedAt    DateTime?          @map("started_at")
+  completedAt  DateTime?          @map("completed_at")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  workflow     PatientWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  department   Department      @relation(fields: [departmentId], references: [id])
+  service      Service?        @relation(fields: [serviceId], references: [id])
+  queueEntries QueueEntry[]
+
+  @@map("workflow_steps")
+}
+
+// ─── NOTIFICATIONS ──────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false) @map("is_read")
+  data      String?          // JSON metadata
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  user      User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+// ─── AI ─────────────────────────────────────────────────
+
+model AIConversation {
+  id        String   @id @default(uuid())
+  patientId String?  @map("patient_id")
+  userId    String?  @map("user_id")
+  context   String?  // admin, patient, etc.
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  patient   Patient?   @relation(fields: [patientId], references: [id])
+  messages  AIMessage[]
+
+  @@map("ai_conversations")
+}
+
+model AIMessage {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  role           String   // user, assistant, system
+  content        String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  // Relations
+  conversation   AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("ai_messages")
+}
+
+// ─── AUDIT ──────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  details   String?  // JSON
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user      User? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ─── SETTINGS ───────────────────────────────────────────
+
+model HospitalSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+  label String?
+  group String?
+
+  @@map("hospital_settings")
+}
